@@ -36,25 +36,31 @@
             <div class="col-6 m-auto">
                 <div class="card">
                     <div class="card-header">
-                        <h2 class="text-center p-3">{{ __('Login') }}</h2>
+                        <h2 class="text-center p-3">{{ __('Register') }}</h2>
                     </div>
                     <div class="card-body">
-                        <form action="{{route('loginPost')}}"  method="post">
-                             @csrf
+                        <form action="{{route('registerPost')}}" method="post" >
+                            @csrf
+                            <label for="name">Name:</label>
+                            <input type="text" class="form-control" name="name" id="name" value="{{ old('name') }}" required>
+                            @error('name')
+                                <span>{{ $message }}</span>
+                            @enderror
+                            <br>
+
                             <label for="email">Email:</label>
-                            <input type="email"  class="form-control" name="email" id="email" value="{{ old('email') }}" required>
+                            <input type="email"class="form-control"  name="email" id="email" value="{{ old('email') }}" required>
                             @error('email')
                                 <span>{{ $message }}</span>
                             @enderror
                             <br>
 
                             <label for="password">Password:</label>
-                            <input type="password"  class="form-control" name="password" id="password" required>
+                            <input type="password" class="form-control" name="password" id="password" required>
                             @error('password')
                                 <span>{{ $message }}</span>
                             @enderror
                             <br>
-                    
                             <!-- Submit button -->
                             <button type="submit" class="btn btn-primary btn-block">Sign in</button>
                         </form>

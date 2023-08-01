@@ -31,59 +31,66 @@
     <br>
 
 
-    <div class="container pt-5 mt-5">
+    <div class="container ">
         <div class="row">
-            <div class="col-6 m-auto">
+            <div class="col-8 m-auto">
                 <div class="card">
                     <div class="card-header">
-                        <h2 class="text-center p-5">{{ __('Login') }}</h2>
+                        <h2 class="text-center p-3">{{ __('Post') }}</h2>
                     </div>
                     <div class="card-body">
-                        <form action="{{route('login')}}" >
+                        <form action="{{route('Post')}}" method="post" >
                             @csrf
                             <!-- Email input -->
                             <div class="form-outline mb-4">
-                            <input type="email" id="form1Example1" class="form-control" />
-                            <label class="form-label" for="form1Example1">Email address</label>
+                               <textarea name="content"  required class="form-control" style="border: 1px solid #4444;" ></textarea>
                             </div>
-                        
-                            <!-- Password input -->
-                            <div class="form-outline mb-4">
-                            <input type="password" id="form1Example2" class="form-control" />
-                            <label class="form-label" for="form1Example2">Password</label>
-                            </div>
-                        
-                            <!-- 2 column grid layout for inline styling -->
-                            <div class="row mb-4">
-               
-                        
-                            <div class="register">
-                                <a href="/">Register</a>
-                            </div>
-                            </div>
-                        
                             <!-- Submit button -->
-                            <button type="submit" class="btn btn-primary btn-block">Sign in</button>
+                            <button type="submit" class="btn btn-primary btn-block">Post Submit</button>
                         </form>
                     </div>
                 </div>
+                <hr>
+                <br>
+                @foreach($posts as $item)
+                <div class="card">
+                  <div class="card-body">
+                    <h5 class="card-title">{{$item->user['name']}}</h5>
+                    <p class="card-text">{{$item->content}}</p>
+                
+        
+
+                    <p class="d-inline-flex gap-1">
+                      <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseExample{{$item->id}}" role="button" aria-expanded="false" aria-controls="collapseExample{{$item->id}}">
+                       comments
+                      </a>
+
+                    </p>
+                    <div class="collapse" id="collapseExample{{$item->id}}">
+
+                        <form action="{{route('Post')}}" method="post" >
+                            @csrf
+                            <!-- Email input -->
+                            <div class="form-outline mb-4">
+                               <textarea name="comment"  required class="form-control" style="border: 1px solid #4444;" ></textarea>
+                            </div>
+                            <!-- Submit button -->
+                            <button type="submit" class="btn btn-primary btn-block">comment</button>
+                        </form>
+
+                      <div class="card card-body">
+                        Some placeholder content for the collapse component. This panel is hidden by default but revealed when the user activates the relevant trigger.
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+                <br>
+                @endforeach
+
             </div>
         </div>
     </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
