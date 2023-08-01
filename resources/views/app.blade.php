@@ -4,6 +4,9 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
+
+    <link rel="stylesheet" href="{{ asset('js/Toast.css') }}">
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
@@ -18,19 +21,13 @@
     rel="stylesheet"
     />
     <!-- MDB -->
-    <link
-    href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.1/mdb.min.css"
-    rel="stylesheet"
-    />
-    <title>Hello, world!</title>
+
+    <title>Blog | Post</title>
   </head>
-  <body style="background: #c0c0c0" >
-  
+  <body class="body" style="background: #c0c0c0" >
+    <script src="{{ asset('js/Toast.js') }}"></script>
     <br>
-    <br>
-    <br>
-
-
+ 
     <div class="container ">
         <div class="row">
             <div class="col-8 m-auto">
@@ -39,64 +36,114 @@
                         <h2 class="text-center p-3">{{ __('Post') }}</h2>
                     </div>
                     <div class="card-body">
-                        <form action="{{route('Post')}}" method="post" >
+                        <form id="form" method="post" >
                             @csrf
                             <!-- Email input -->
                             <div class="form-outline mb-4">
-                               <textarea name="content"  required class="form-control" style="border: 1px solid #4444;" ></textarea>
+                               <textarea  placeholder="Post content.."  name="content"   class="form-control" style="border: 1px solid #4444;" ></textarea>
                             </div>
                             <!-- Submit button -->
                             <button type="submit" class="btn btn-primary btn-block">Post Submit</button>
                         </form>
                     </div>
                 </div>
-                <hr>
                 <br>
-                @foreach($posts as $item)
-                <div class="card">
-                  <div class="card-body">
-                    <h5 class="card-title">{{$item->user['name']}}</h5>
-                    <p class="card-text">{{$item->content}}</p>
-                
-        
-
-                    <p class="d-inline-flex gap-1">
-                      <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseExample{{$item->id}}" role="button" aria-expanded="false" aria-controls="collapseExample{{$item->id}}">
-                       comments
-                      </a>
-
-                    </p>
-                    <div class="collapse" id="collapseExample{{$item->id}}">
-
-                        <form action="{{route('Post')}}" method="post" >
-                            @csrf
-                            <!-- Email input -->
-                            <div class="form-outline mb-4">
-                               <textarea name="comment"  required class="form-control" style="border: 1px solid #4444;" ></textarea>
-                            </div>
-                            <!-- Submit button -->
-                            <button type="submit" class="btn btn-primary btn-block">comment</button>
-                        </form>
-
-                      <div class="card card-body">
-                        Some placeholder content for the collapse component. This panel is hidden by default but revealed when the user activates the relevant trigger.
-                      </div>
-                    </div>
-
+                <div class="AllPost">
+                  <div class="m-auto d-block spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
                   </div>
                 </div>
-                <br>
-                @endforeach
+              
+                
 
             </div>
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js" integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa" crossorigin="anonymous"></script>
+    <script>
+      $(document).ready(function() {
+        loadPost();
+        function loadPost(){
+          $('.AllPost').html(" ");
+          $.ajax({
+              type:'get',
+              url: '/post',
+              contentType:false,
+              processData:false,
+              success: function(res){
+                  $('.AllPost').html(res);
+              },
+              error:function (response){
+                  console.log(response);
+              }
+          });
+        }
+             
+        $(document).on('submit','#form',function(e){
+            e.preventDefault()
+            let formData = new FormData($(this)[0]);
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                type:'post',
+                url: '/post',
+                data:formData,
+                contentType:false,
+                processData:false,
+                success: function(res){
+                    if (res.success==false) {
+                        $.each(res.errors, function(key, item){
+                            ToastMessage("error",item,3000,'top-center');
+                        })
+                    }else{
+                        ToastMessage("success"," Post Success!",3000,'top-center');
+                        $('#form')[0].reset();
+                        loadPost();
+                    }
+                },
+                error:function (response){
+                    console.log(response);
+                }
+            });
+        })
+
+        $(document).on('submit','.formPost',function(e){
+            e.preventDefault()
+            let formData = new FormData($(this)[0]);
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                type:'post',
+                url: '/Commentpost',
+                data:formData,
+                contentType:false,
+                processData:false,
+                success: function(res){
+                    if (res.success==false) {
+                        $.each(res.errors, function(key, item){
+                            ToastMessage("error",item,3000,'top-center');
+                        })
+                    }else{
+                        ToastMessage("success","Success!",3000,'top-center');
+                        loadPost();
+                    }
+                },
+                error:function (response){
+                    console.log(response);
+                }
+            });
+        })
 
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
-  
+
+
+      });
+    </script>
   </body>
 </html>

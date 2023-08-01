@@ -19,6 +19,8 @@ Route::middleware('auth')->group(function () {
 
 	// post
 	Route::post('/post',[App\Http\Controllers\PostController::class, 'Post'])->name('Post');
+	Route::post('/Commentpost',[App\Http\Controllers\CommentController::class, 'Commentpost'])->name('Commentpost');
+	Route::get('/post',[App\Http\Controllers\PostController::class, 'PostAll']);
 
 });
 Route::get('/login', [App\Http\Controllers\AuthController::class, 'login'])->name('login');
